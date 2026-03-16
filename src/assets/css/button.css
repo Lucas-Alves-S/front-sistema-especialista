@@ -1,0 +1,157 @@
+button,
+.button {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  text-decoration: none;
+  line-height: normal;
+
+  &:disabled {
+    color: color-mix(in hsl, var(--color-text), black 42%);
+    background-color: color-mix(in hsl, var(--color-primary), black 32%);
+    pointer-events: none;
+  }
+}
+
+button.primary,
+.button.primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  outline-color: var(--color-primary);
+
+  &:hover {
+    background-color: color-mix(in hsl, var(--color-primary), black 16%);
+  }
+
+  &:active {
+    box-shadow: inset 2px 4px 4px rgba(0, 0, 0, 0.24);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.24);
+  }
+
+  &:disabled {
+    background-color: color-mix(in hsl, var(--color-primary), black 32%);
+  }
+}
+
+button.secondary,
+.button.secondary {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  outline-color: var(--color-secondary);
+
+  &:hover {
+    background-color: color-mix(in hsl, var(--color-secondary), black 16%);
+  }
+
+  &:active {
+    box-shadow: inset 2px 4px 4px rgba(0, 0, 0, 0.24);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.24);
+  }
+
+  &:disabled {
+    background-color: color-mix(in hsl, var(--color-secondary), black 32%);
+  }
+}
+
+button.accent,
+.button.accent {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  outline-color: var(--color-accent);
+
+  &:hover {
+    background-color: color-mix(in hsl, var(--color-accent), black 16%);
+  }
+
+  &:active {
+    box-shadow: inset 2px 4px 4px rgba(0, 0, 0, 0.24);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.24);
+  }
+
+  &:disabled {
+    background-color: color-mix(in hsl, var(--color-accent), black 32%);
+  }
+}
+
+button.success,
+.button.success {
+  background-color: var(--color-success);
+  border-color: var(--color-success);
+  outline-color: var(--color-success);
+
+  &:hover {
+    background-color: color-mix(in hsl, var(--color-success), black 16%);
+  }
+
+  &:active {
+    box-shadow: inset 2px 4px 4px rgba(0, 0, 0, 0.24);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.24);
+  }
+
+  &:disabled {
+    background-color: color-mix(in hsl, var(--color-success), black 32%);
+  }
+}
+
+button.warning,
+.button.warning {
+  background-color: var(--color-warning);
+  border-color: var(--color-warning);
+  outline-color: var(--color-warning);
+
+  &:hover {
+    background-color: color-mix(in hsl, var(--color-warning), black 16%);
+  }
+
+  &:active {
+    box-shadow: inset 2px 4px 4px rgba(0, 0, 0, 0.24);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.24);
+  }
+
+  &:disabled {
+    background-color: color-mix(in hsl, var(--color-warning), black 32%);
+  }
+}
+
+button.danger,
+.button.danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  outline-color: var(--color-danger);
+
+  &:hover {
+    background-color: color-mix(in hsl, var(--color-danger), black 16%);
+  }
+
+  &:active {
+    box-shadow: inset 2px 4px 4px rgba(0, 0, 0, 0.24);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.24);
+  }
+
+  &:disabled {
+    background-color: color-mix(in hsl, var(--color-danger), black 32%);
+  }
+}
+
+button.small,
+.button.small {
+  padding: 0.2rem 0.4rem;
+  height: fit-content;
+}
+
+button.round,
+.button.round {
+  border-radius: 24px;
+}
+
+button.outlined,
+.button.outlined {
+  background: none;
+  outline-style: solid;
+  outline-width: 0.16rem;
+}

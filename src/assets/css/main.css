@@ -1,0 +1,95 @@
+@import './variables.css';
+@import './themes.css';
+@import './text.css';
+@import './icons.css';
+@import './button.css';
+@import './inputs.css';
+@import './info.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  font-weight: normal;
+}
+
+/* width */
+*::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+*::-webkit-scrollbar-thumb {
+  background: rgb(241, 241, 241, 0.4);
+  border-radius: 1rem;
+}
+
+/* Handle on hover */
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  border-color: var(--color-border);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.5;
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  text-rendering: optimizeLegibility;
+}
+
+fieldset {
+  border: none;
+}
+
+.disabled {
+  color: var(--color-subtext-1);
+  pointer-events: none;
+}
+
+.container {
+  display: flex;
+  width: 100%;
+  gap: 0.6rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.mobile-only {
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+.desktop-only {
+  @media (max-width: 768px) {
+    display: none;
+  }
+}
+
+.pointer {
+  cursor: pointer;
+}

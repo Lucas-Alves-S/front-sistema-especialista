@@ -1,0 +1,30 @@
+.info {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 100%;
+  margin-right: 0.3rem;
+}
+
+.info.success {
+  background-color: var(--color-success);
+}
+
+.info.warning {
+  background-color: var(--color-warning);
+}
+
+.info.danger {
+  background-color: var(--color-danger);
+}
+.info.half {
+  background-color: var(--color-half-success);
+}
+
+.info.pending {
+  background-color: var(--color-pending);
+}
+
+.info.white {
+  background-color: gray;
+}
+
