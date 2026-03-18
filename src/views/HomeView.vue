@@ -1,5 +1,12 @@
 <template>
   <div class="home">
+    <div class="top-bar">
+      <button class="button secondary" @click="router.push({ name: 'add-question' })" :disabled="loading">
+        <span class="material-symbols-outlined">add_circle</span>
+        Adicionar Pergunta
+      </button>
+    </div>
+
     <div class="hero">
       <span class="material-symbols-outlined hero-icon">psychology</span>
       <h1>Sistema Especialista</h1>
@@ -51,7 +58,7 @@ async function submit() {
   loading.value = true
   error.value = ''
   try {
-    const response = await fetch(`${API_BASE}/api/symptom`, {
+    const response = await fetch(`${API_BASE}/api/questions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ symptom: symptom.value.trim() })
@@ -74,6 +81,11 @@ async function submit() {
   min-height: 100vh;
   padding: 2rem 1rem;
   gap: 2rem;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
 }
 
 .hero {

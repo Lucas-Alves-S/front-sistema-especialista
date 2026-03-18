@@ -20,10 +20,10 @@
           </div>
 
           <div class="answers">
-            <button v-for="(item, index) in current.answers" :key="index" class="answer-btn" :disabled="loading"
-              @click="selectAnswer(item)">
+            <button v-for="(answer, index) in current.answers" :key="index" class="answer-btn" :disabled="loading"
+              @click="selectAnswer(index)">
               <span class="material-symbols-outlined">chevron_right</span>
-              {{ item.answer }}
+              {{ answer }}
             </button>
           </div>
         </BaseCard>
@@ -43,15 +43,17 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/BaseCard.vue'
 
-interface Answer {
-  answer: string
-  api_url: string
+interface Meta {
+  question_id: string
 }
 
 interface QuestionData {
   question: string
-  answers: Answer[]
+  answers: string[]
+  meta: Meta
 }
+
+const API_BASE = import.meta.env.VITE_API_BASE ?? ''
 
 const router = useRouter()
 const current = ref<QuestionData | null>(null)
@@ -71,11 +73,16 @@ onMounted(() => {
   }
 })
 
-async function selectAnswer(item: Answer) {
+async function selectAnswer(index: number) {
+  if (!current.value) return
   loading.value = true
   error.value = ''
   try {
-    const response = await fetch(item.api_url, { method: 'POST' })
+    const response = await fetch(`${API_BASE}/api/questions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ meta: current.value.meta, selected: index })
+    })
     if (!response.ok) throw new Error(`Erro ${response.status}`)
     const data: QuestionData = await response.json()
     current.value = data
