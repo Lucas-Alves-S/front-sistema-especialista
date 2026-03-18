@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ExpertView from '../views/ExpertView.vue'
+import AddQuestionView from '../views/AddQuestionView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/expert',
       name: 'expert',
       component: ExpertView
+    },
+    {
+      path: '/add-question',
+      name: 'add-question',
+      component: AddQuestionView
     }
   ]
 })
