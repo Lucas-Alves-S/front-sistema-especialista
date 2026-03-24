@@ -5,32 +5,29 @@
         <span class="material-symbols-outlined">add_circle</span>
         Adicionar Pergunta
       </button>
+      <button class="button secondary" @click="router.push({ name: 'add-solution' })" :disabled="loading">
+        <span class="material-symbols-outlined">lightbulb</span>
+        Adicionar Solução
+      </button>
     </div>
 
     <div class="hero">
       <span class="material-symbols-outlined hero-icon">psychology</span>
       <h1>Sistema Especialista</h1>
-      <p class="subtitle">Descreva o problema ou sintoma que está enfrentando e nosso sistema irá guiá-lo até a solução.</p>
+      <p class="subtitle">Descreva o problema ou sintoma que está enfrentando e nosso sistema irá guiá-lo até a solução.
+      </p>
     </div>
 
     <div class="input-area">
       <BaseCard :shadow="true" :border="true" class="symptom-card">
         <h3>Qual é o sintoma ou problema?</h3>
         <div class="textarea-wrapper">
-          <textarea
-            v-model="symptom"
-            placeholder="Descreva o sintoma inicial em detalhes..."
-            :disabled="loading"
-            rows="4"
-          />
+          <textarea v-model="symptom" placeholder="Descreva o sintoma inicial em detalhes..." :disabled="loading"
+            rows="4" />
         </div>
         <p v-if="error" class="error-msg">{{ error }}</p>
         <div class="card-footer">
-          <button
-            class="button primary"
-            :disabled="!symptom.trim() || loading"
-            @click="submit"
-          >
+          <button class="button primary" :disabled="!symptom.trim() || loading" @click="submit">
             <span v-if="loading" class="material-symbols-outlined spin">refresh</span>
             <span v-else class="material-symbols-outlined">send</span>
             {{ loading ? 'Analisando...' : 'Iniciar Diagnóstico' }}
@@ -58,14 +55,14 @@ async function submit() {
   loading.value = true
   error.value = ''
   try {
-    const response = await fetch(`${API_BASE}/api/questions`, {
+    const response = await fetch(`${API_BASE}/api/analyze`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ symptom: symptom.value.trim() })
+      body: JSON.stringify({ text: symptom.value.trim() })
     })
     if (!response.ok) throw new Error(`Erro ${response.status}`)
     const data = await response.json()
-    router.push({ name: 'expert', state: { questionData: JSON.stringify(data) } })
+    router.push({ name: 'expert', state: { initialData: JSON.stringify(data) } })
   } catch (err: any) {
     error.value = err.message ?? 'Erro ao conectar com o servidor.'
   } finally {
@@ -158,7 +155,7 @@ async function submit() {
 .button {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  margin-right: 1rem;
 }
 
 .error-msg {
@@ -167,8 +164,13 @@ async function submit() {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spin {
