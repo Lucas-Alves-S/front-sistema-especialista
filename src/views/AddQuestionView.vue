@@ -246,10 +246,12 @@ async function save() {
   display: flex;
   flex: 1;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .answer-inputs input {
   flex: 1;
+  min-width: 0;
   padding: 0.5rem 0.7rem;
   background-color: var(--color-base);
   color: var(--color-text);
