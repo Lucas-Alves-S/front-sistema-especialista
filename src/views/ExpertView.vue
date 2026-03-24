@@ -13,12 +13,14 @@
 
     <div class="content">
       <Transition name="fade" mode="out-in">
-        <BaseCard v-if="current" :key="current.question" :shadow="true" :border="true" class="question-card">
+
+        <!-- Pergunta atual -->
+        <BaseCard v-if="viewState === 'question' && current" :key="current.questionId" :shadow="true" :border="true"
+          class="main-card">
           <div class="question-header">
             <span class="material-symbols-outlined question-icon">help_outline</span>
             <h2>{{ current.question }}</h2>
           </div>
-
           <div class="answers">
             <button v-for="(answer, index) in current.answers" :key="index" class="answer-btn" :disabled="loading"
               @click="selectAnswer(index)">
@@ -28,11 +30,42 @@
           </div>
         </BaseCard>
 
-        <div v-else-if="error" class="error-state">
+        <!-- Solução encontrada -->
+        <BaseCard v-else-if="viewState === 'solution'" key="solution" :shadow="true" :border="true" class="main-card">
+          <div class="solution-header">
+            <span class="material-symbols-outlined solution-icon">check_circle</span>
+            <h2>Solução Encontrada</h2>
+          </div>
+          <p class="solution-description">{{ solution?.description }}</p>
+
+          <div class="history-section">
+            <h3>Respostas fornecidas</h3>
+            <div class="history-list">
+              <div v-for="(item, i) in answerHistory" :key="i" class="history-item">
+                <span class="history-question">{{ item.question }}</span>
+                <span class="history-answer">
+                  <span class="material-symbols-outlined">arrow_forward</span>
+                  {{ item.answer }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <button class="button primary" @click="goHome">
+              <span class="material-symbols-outlined">home</span>
+              Novo Diagnóstico
+            </button>
+          </div>
+        </BaseCard>
+
+        <!-- Erro -->
+        <div v-else-if="viewState === 'error'" key="error" class="error-state">
           <span class="material-symbols-outlined error-icon">error</span>
           <p>{{ error }}</p>
           <button class="button danger" @click="goHome">Voltar ao Início</button>
         </div>
+
       </Transition>
     </div>
   </div>
@@ -43,31 +76,44 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/BaseCard.vue'
 
-interface Meta {
-  question_id: string
-}
-
-interface QuestionData {
+interface QuestionState {
+  questionId: number
   question: string
   answers: string[]
-  meta: Meta
+}
+
+interface SolutionState {
+  id: number
+  description: string
+}
+
+interface HistoryItem {
+  question: string
+  answer: string
 }
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? ''
 
 const router = useRouter()
-const current = ref<QuestionData | null>(null)
+const viewState = ref<'question' | 'solution' | 'error'>('question')
+const current = ref<QuestionState | null>(null)
+const solution = ref<SolutionState | null>(null)
+const answerHistory = ref<HistoryItem[]>([])
+const collectedParams = ref<string[]>([])
+const askedQuestionIds = ref<number[]>([])
 const loading = ref(false)
 const error = ref('')
 
 onMounted(() => {
-  const state = history.state?.questionData
-  if (!state) {
+  const raw = history.state?.initialData
+  if (!raw) {
     router.replace({ name: 'home' })
     return
   }
   try {
-    current.value = JSON.parse(state)
+    const data = JSON.parse(raw)
+    current.value = { questionId: data.questionId, question: data.question, answers: data.answers }
+    askedQuestionIds.value = [data.questionId]
   } catch {
     router.replace({ name: 'home' })
   }
@@ -78,17 +124,40 @@ async function selectAnswer(index: number) {
   loading.value = true
   error.value = ''
   try {
-    const response = await fetch(`${API_BASE}/api/questions`, {
+    const response = await fetch(`${API_BASE}/api/analyze/answer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ meta: current.value.meta, selected: index })
+      body: JSON.stringify({
+        questionId: current.value.questionId,
+        selectedAnswerIndex: index,
+        collectedParams: collectedParams.value,
+        askedQuestionIds: askedQuestionIds.value,
+        history: answerHistory.value
+      })
     })
-    if (!response.ok) throw new Error(`Erro ${response.status}`)
-    const data: QuestionData = await response.json()
-    current.value = data
+
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}))
+      throw new Error(body?.message ?? `Erro ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data.type === 'solution') {
+      solution.value = data.solution
+      answerHistory.value = data.history
+      viewState.value = 'solution'
+    } else {
+      // Atualiza estado com a nova pergunta
+      if (data.newParam) {
+        collectedParams.value = [...collectedParams.value, data.newParam]
+      }
+      askedQuestionIds.value = [...askedQuestionIds.value, data.questionId]
+      current.value = { questionId: data.questionId, question: data.question, answers: data.answers }
+    }
   } catch (err: any) {
     error.value = err.message ?? 'Erro ao conectar com o servidor.'
-    current.value = null
+    viewState.value = 'error'
   } finally {
     loading.value = false
   }
@@ -126,10 +195,14 @@ function goHome() {
   flex: 1;
 }
 
-.question-card {
+.main-card {
   width: min(640px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
+/* Pergunta */
 .question-header {
   display: flex;
   align-items: flex-start;
@@ -177,6 +250,75 @@ function goHome() {
   cursor: not-allowed;
 }
 
+/* Solução */
+.solution-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.solution-icon {
+  font-size: 2rem;
+  color: var(--color-success, #4caf50);
+  flex-shrink: 0;
+}
+
+.solution-description {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  padding: 0.75rem 1rem;
+  background-color: var(--color-surface-2);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 4px;
+}
+
+.history-section h3 {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-subtext);
+  margin-bottom: 0.75rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.75rem;
+  background-color: var(--color-surface-2);
+  border-radius: 4px;
+  border: 1px solid var(--color-overlay-1);
+}
+
+.history-question {
+  font-size: 0.85rem;
+  color: var(--color-subtext);
+}
+
+.history-answer {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 500;
+}
+
+.history-answer .material-symbols-outlined {
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Erro */
 .error-state {
   display: flex;
   flex-direction: column;
@@ -217,7 +359,7 @@ function goHome() {
   }
 }
 
-/* Route transition */
+/* Transição */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
